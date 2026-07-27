@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Go ${{ matrix.go-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go-version: ["1.18.x", stable]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ matrix.go-version }}
+          cache-dependency-path: go.sum
+
+      - name: Verify formatting
+        run: test -z "$(gofmt -l .)"
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Unit tests with race detector
+        run: go test -race -coverprofile=coverage.out -count=1 ./...
+
+      - name: Report coverage
+        run: go tool cover -func=coverage.out
+
+  integration:
+    name: Redis integration
+    runs-on: ubuntu-latest
+    services:
+      redis-1:
+        image: redis:8.4-alpine
+        ports:
+          - 6381:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 1s
+          --health-timeout 5s
+          --health-retries 20
+      redis-2:
+        image: redis:8.4-alpine
+        ports:
+          - 6382:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 1s
+          --health-timeout 5s
+          --health-retries 20
+      redis-3:
+        image: redis:8.4-alpine
+        ports:
+          - 6383:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 1s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+          cache-dependency-path: go.sum
+
+      - name: Run single-node and Redlock integration tests
+        env:
+          REDIS_ADDR: 127.0.0.1:6381
+          REDLOCK_REDIS_ADDRS: 127.0.0.1:6381,127.0.0.1:6382,127.0.0.1:6383
+        run: go test -race -run '^TestIntegration' -count=1 -v ./...
