@@ -1,6 +1,6 @@
 module github.com/ndyakov/go-redlock
 
-go 1.18
+go 1.21
 
 require github.com/redis/go-redis/v9 v9.17.2
 

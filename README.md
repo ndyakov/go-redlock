@@ -327,29 +327,6 @@ REDLOCK_REDIS_ADDRS=localhost:6381,localhost:6382,localhost:6383 \
 The Docker Compose setup is for testing only; three containers on one machine
 do not have independent production failure domains.
 
-## Publishing the repository
-
-The publishing script creates the initial commit, creates the public
-`ndyakov/go-redlock` GitHub repository, configures `origin`, and pushes `main`:
-
-```sh
-gh auth login
-./scripts/publish.sh
-```
-
-It is safe to rerun after publishing. If the GitHub repository already exists,
-the script reuses it. Once an initial commit exists, the script refuses to run
-with uncommitted changes, so it cannot silently publish unfinished edits.
-
-The destination, visibility, and first commit message can be overridden:
-
-```sh
-GITHUB_REPOSITORY=ndyakov/go-redlock \
-GITHUB_VISIBILITY=private \
-INITIAL_COMMIT_MESSAGE="Initial go-redlock implementation" \
-./scripts/publish.sh
-```
-
 ## References
 
 - [Redis distributed locks and Redlock algorithm](https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/)
