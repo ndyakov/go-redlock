@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo.svg" alt="go-redlock — Redis-backed distributed leases for Go" width="360">
+</p>
+
 # go-redlock
 
 [![CI](https://github.com/ndyakov/go-redlock/actions/workflows/ci.yml/badge.svg)](https://github.com/ndyakov/go-redlock/actions/workflows/ci.yml)
@@ -337,3 +341,9 @@ do not have independent production failure domains.
 ## License
 
 MIT
+
+## Credits
+
+The Go gopher in the logo was designed by [Renee French](https://reneefrench.blogspot.com/);
+the vector version is by [Takuya Ueda](https://github.com/golang-samples/gopher-vector)
+(CC BY 3.0).
